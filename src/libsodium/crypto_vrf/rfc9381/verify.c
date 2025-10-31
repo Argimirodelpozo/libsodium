@@ -84,6 +84,7 @@ vrf_rfc9381_verify(const unsigned char *pi,
     crypto_hash_sha512_state hs;
     ge25519_p2 U; 
     ge25519_p3 V;
+    ge25519_p3 v0, v1;
     ge25519_p3     H, Gamma;
     ge25519_p1p1   tmp_p1p1_point;
     ge25519_cached tmp_cached_point;
@@ -110,13 +111,11 @@ vrf_rfc9381_verify(const unsigned char *pi,
     ge25519_frombytes(&H, H_string);
     sc25519_negate(cn, c); /* negate scalar c */
 
-    // ge25519_double_scalarmult_vartime(&U, cn, Y_point, s, NULL);
-    ge25519_double_scalarmult_vartime(&U, cn, Y_point, s); //multiples s by precomp. base point
+    // U = cn * Y_point + s * B, where B is the base point
+    ge25519_double_scalarmult_vartime(&U, cn, Y_point, s);
 
-    // ge25519_double_scalarmult_vartime(&V, cn, &Gamma, s, &H);
-    ge25519_p3 v0;
+    // V = cn * Gamma + s * H
     ge25519_scalarmult(&v0, cn, &Gamma);
-    ge25519_p3 v1;
     ge25519_scalarmult(&v1, s, &H);
     ge25519_p3_add(&V, &v0, &v1);
 
