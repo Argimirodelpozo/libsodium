@@ -18,7 +18,6 @@ crypto_vrf_rfc9381_prove(unsigned char *proof,
     unsigned char az[64];
     unsigned char H_string[32];
     unsigned char kB_string[32], kH_string[32];
-    // unsigned char string_to_hash[32 + mlen];  //ACA
     unsigned char challenge[64] = {0U};
     unsigned char nonce[64];
     ge25519_p3    H, Gamma, kB, kH;
@@ -28,12 +27,7 @@ crypto_vrf_rfc9381_prove(unsigned char *proof,
     az[31] &= 127;
     az[31] |= 64;
 
-    //replacement...
     _ECVRF_encode_to_curve_h2c_suite(H_string, &sk[32], m, mlen);
-    // memmove(string_to_hash, sk + 32, 32);
-    // memmove(string_to_hash + 32, m, mlen);
-    // // ge25519_from_string(H_string, "ECVRF_edwards25519_XMD:SHA-512_ELL2_NU_\4", string_to_hash, 32 + mlen, 2); /* elligator2 */
-    // crypto_core_ed25519_from_string(H_string, "ECVRF_edwards25519_XMD:SHA-512_ELL2_NU_\4", string_to_hash, 32 + mlen, 2); /* elligator2 */
 
     ge25519_frombytes(&H, H_string);
     ge25519_scalarmult(&Gamma, az, &H);
@@ -80,7 +74,6 @@ int crypto_vrf_ietfdraft03_prove(unsigned char *proof,
     unsigned char az[64];
     unsigned char H_string[32];
     unsigned char kB_string[32], kH_string[32];
-    // unsigned char string_to_hash[32 + mlen];  //ACA
     unsigned char challenge[64] = {0U};
     unsigned char nonce[64];
     ge25519_p3    H, Gamma, kB, kH, pk;
@@ -90,13 +83,8 @@ int crypto_vrf_ietfdraft03_prove(unsigned char *proof,
     az[31] &= 127;
     az[31] |= 64;
 
-    //replacement...
     ge25519_frombytes(&pk, &sk[32]);
     _vrf_ietfdraft03_hash_to_curve_elligator2_25519(H_string, &pk, m, mlen);
-    // memmove(string_to_hash, sk + 32, 32);
-    // memmove(string_to_hash + 32, m, mlen);
-    // // ge25519_from_string(H_string, "ECVRF_edwards25519_XMD:SHA-512_ELL2_NU_\4", string_to_hash, 32 + mlen, 2); /* elligator2 */
-    // crypto_core_ed25519_from_string(H_string, "ECVRF_edwards25519_XMD:SHA-512_ELL2_NU_\4", string_to_hash, 32 + mlen, 2); /* elligator2 */
 
     ge25519_frombytes(&H, H_string);
     ge25519_scalarmult(&Gamma, az, &H);
@@ -117,12 +105,10 @@ int crypto_vrf_ietfdraft03_prove(unsigned char *proof,
     crypto_hash_sha512_init(&hs);
     crypto_hash_sha512_update(&hs, &SUITE, 1);
     crypto_hash_sha512_update(&hs, &TWO, 1);
-    // crypto_hash_sha512_update(&hs, sk + 32, 32);
     crypto_hash_sha512_update(&hs, H_string, 32);
     crypto_hash_sha512_update(&hs, proof, 32);
     crypto_hash_sha512_update(&hs, kB_string, 32);
     crypto_hash_sha512_update(&hs, kH_string, 32);
-    // crypto_hash_sha512_update(&hs, &ZERO, 1);
     crypto_hash_sha512_final(&hs, challenge);
 
     memmove(proof + 32, challenge, 16);

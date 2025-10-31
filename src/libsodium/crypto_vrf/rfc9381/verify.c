@@ -67,7 +67,6 @@ crypto_vrf_ietfdraft03_proof_to_hash(unsigned char *beta,
     crypto_hash_sha512_update(&hs, &SUITE, 1);
     crypto_hash_sha512_update(&hs, &THREE, 1);
     crypto_hash_sha512_update(&hs, gamma_string, 32);
-    // crypto_hash_sha512_update(&hs, &ZERO, 1);
     crypto_hash_sha512_final(&hs, beta);
 
     return 0;
@@ -80,14 +79,11 @@ vrf_rfc9381_verify(const unsigned char *pi,
 {
     unsigned char H_string[32], U_string[32], V_string[32], Y_string[32];
     unsigned char cn[32], c[32], s[32];
-    // unsigned char string_to_hash[32 + alphalen];
     unsigned char challenge[64];
 
     crypto_hash_sha512_state hs;
-
-    // ge25519_p2     U, V;
-    ge25519_p2     U; ge25519_p3 V;
-
+    ge25519_p2 U; 
+    ge25519_p3 V;
     ge25519_p3     H, Gamma;
     ge25519_p1p1   tmp_p1p1_point;
     ge25519_cached tmp_cached_point;
@@ -109,11 +105,7 @@ vrf_rfc9381_verify(const unsigned char *pi,
 
     memset(c + 16, 0, 16);
 
-    //replace by...
     _ECVRF_encode_to_curve_h2c_suite(H_string, Y_string, alpha, alphalen);
-    // memmove(string_to_hash, Y_string, 32);
-    // memmove(string_to_hash + 32, alpha, alphalen);
-    // ge25519_from_string(H_string, "ECVRF_edwards25519_XMD:SHA-512_ELL2_NU_\4", string_to_hash, 32 + alphalen, 2); /* elligator2 */
 
     ge25519_frombytes(&H, H_string);
     sc25519_negate(cn, c); /* negate scalar c */
@@ -128,9 +120,7 @@ vrf_rfc9381_verify(const unsigned char *pi,
     ge25519_scalarmult(&v1, s, &H);
     ge25519_p3_add(&V, &v0, &v1);
 
-
     ge25519_tobytes(U_string, &U);
-    // ge25519_tobytes(V_string, &V);
     ge25519_p3_tobytes(V_string, &V);
 
     crypto_hash_sha512_init(&hs);
@@ -158,8 +148,9 @@ vrf_ietfdraft03_verify(const unsigned char *pi,
 
     crypto_hash_sha512_state hs;
 
-    // ge25519_p2     U, V;
-    ge25519_p2     U; ge25519_p3 V;
+    ge25519_p2 U; 
+    ge25519_p3 V;
+    ge25519_p3 v0, v1;
 
     ge25519_p3     H, Gamma;
     ge25519_p1p1   tmp_p1p1_point;
@@ -179,42 +170,31 @@ vrf_ietfdraft03_verify(const unsigned char *pi,
         sc25519_is_canonical(s) == 0) {
         return -1;
     }
-
     memset(c + 16, 0, 16);
 
-    //replace by...
     _vrf_ietfdraft03_hash_to_curve_elligator2_25519(H_string, Y_point, alpha, alphalen);
-    // memmove(string_to_hash, Y_string, 32);
-    // memmove(string_to_hash + 32, alpha, alphalen);
-    // ge25519_from_string(H_string, "ECVRF_edwards25519_XMD:SHA-512_ELL2_NU_\4", string_to_hash, 32 + alphalen, 2); /* elligator2 */
 
     ge25519_frombytes(&H, H_string);
     sc25519_negate(cn, c); /* negate scalar c */
 
-    // ge25519_double_scalarmult_vartime(&U, cn, Y_point, s, NULL);
-    ge25519_double_scalarmult_vartime(&U, cn, Y_point, s); //multiples s by precomp. base point
+    // U = cn * Y_point + s * B, where B is the base point
+    ge25519_double_scalarmult_vartime(&U, cn, Y_point, s);
 
-    // ge25519_double_scalarmult_vartime(&V, cn, &Gamma, s, &H);
-    ge25519_p3 v0;
+    // V = cn * Gamma + s * H
     ge25519_scalarmult(&v0, cn, &Gamma);
-    ge25519_p3 v1;
     ge25519_scalarmult(&v1, s, &H);
     ge25519_p3_add(&V, &v0, &v1);
 
-
     ge25519_tobytes(U_string, &U);
-    // ge25519_tobytes(V_string, &V);
     ge25519_p3_tobytes(V_string, &V);
 
     crypto_hash_sha512_init(&hs);
     crypto_hash_sha512_update(&hs, &SUITE, 1);
     crypto_hash_sha512_update(&hs, &TWO, 1);
-    // crypto_hash_sha512_update(&hs, Y_string, 32);
     crypto_hash_sha512_update(&hs, H_string, 32);
     crypto_hash_sha512_update(&hs, pi, 32);
     crypto_hash_sha512_update(&hs, U_string, 32);
     crypto_hash_sha512_update(&hs, V_string, 32);
-    // crypto_hash_sha512_update(&hs, &ZERO, 1);
     crypto_hash_sha512_final(&hs, challenge);
 
     return crypto_verify_16(c, challenge);

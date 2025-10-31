@@ -68,110 +68,25 @@ _ECVRF_encode_to_curve_h2c_suite(unsigned char H_string[32],
     crypto_hash_sha512_update(&st, &ctx_len_u8, 1U);
     crypto_hash_sha512_final(&st, u0);
 
-    //for (i = 0U; i < h_len; i += 64) {
-        for (j = 0U; j < 64; j++) {
-            ux[j] ^= u0[j];
-        }
-        t[2]++;
-        crypto_hash_sha512_init(&st);
-        crypto_hash_sha512_update(&st, ux, 64);
-        crypto_hash_sha512_update(&st, &t[2], 1U);
-        crypto_hash_sha512_update(&st, (const unsigned char *) ctx, ctx_len);
-        crypto_hash_sha512_update(&st, &ctx_len_u8, 1U);
-        crypto_hash_sha512_final(&st, ux);
-        memcpy(&h_be[0], ux, h_len >= (sizeof ux) ? (sizeof ux) : h_len);
-    // }
-    // if (core_h2c_string_to_hash(h_be, n * HASH_GE_L, ctx, msg, msg_len,
-    //                             hash_alg) != 0) {
-    //     return -1;
-    // }
+    for (j = 0U; j < 64; j++) {
+        ux[j] ^= u0[j];
+    }
+    t[2]++;
+    crypto_hash_sha512_init(&st);
+    crypto_hash_sha512_update(&st, ux, 64);
+    crypto_hash_sha512_update(&st, &t[2], 1U);
+    crypto_hash_sha512_update(&st, (const unsigned char *) ctx, ctx_len);
+    crypto_hash_sha512_update(&st, &ctx_len_u8, 1U);
+    crypto_hash_sha512_final(&st, ux);
+    memcpy(&h_be[0], ux, h_len >= (sizeof ux) ? (sizeof ux) : h_len);
 
     for (j = 0U; j < 48; j++) {
         h[j] = h_be[48 - 1U - j];
     }
+
     memset(&h[j], 0, (sizeof h) - j);
     ge25519_from_hash(H_string, h);
     return 0;
 }
-
-// /*
-//  Variable time double scalar multiplication with variable bases
-//  r = a * A + b * B
-//  where a = a[0]+256*a[1]+...+256^31 a[31].
-//  and b = b[0]+256*b[1]+...+256^31 b[31].
-
-//  If a null pointer is passed as an argument for B, the function uses
-//  the precomputed values of the base point for the scalar multiplication.
-
-//  Only used for ed25519 and VRF verification.
-//  */
-
-// static void
-// _ge25519_double_scalarmult_vartime(ge25519_p2 *r, const unsigned char *a,
-//                                            const ge25519_p3 *A, const unsigned char *b,
-//                                            const ge25519_p3 *B)
-// {
-//     signed char    aslide[256];
-//     signed char    bslide[256];
-//     ge25519_cached Ai[8];
-//     ge25519_p1p1   t;
-//     ge25519_p3     u;
-//     int            i;
-
-//     slide_vartime(aslide, a);
-//     slide_vartime(bslide, b);
-
-//     point_precomputation(Ai, A);
-
-//     ge25519_p2_0(r);
-
-//     for (i = 255; i >= 0; --i) {
-//         if (aslide[i] || bslide[i]) {
-//             break;
-//         }
-//     }
-
-//     for (; i >= 0; --i) {
-//         ge25519_p2_dbl(&t, r);
-
-//         if (aslide[i] > 0) {
-//             ge25519_p1p1_to_p3(&u, &t);
-//             ge25519_add_cached(&t, &u, &Ai[aslide[i] / 2]);
-//         } else if (aslide[i] < 0) {
-//             ge25519_p1p1_to_p3(&u, &t);
-//             ge25519_sub_cached(&t, &u, &Ai[(-aslide[i]) / 2]);
-//         }
-
-//         if (B == NULL) {
-//             static const ge25519_precomp Bi[8] = {
-// #ifdef HAVE_TI_MODE
-// # include "fe_51/base2.h"
-// #else
-// # include "fe_25_5/base2.h"
-// #endif
-//             };
-//             if (bslide[i] > 0) {
-//                 ge25519_p1p1_to_p3(&u, &t);
-//                 ge25519_add_precomp(&t, &u, &Bi[bslide[i] / 2]);
-//             } else if (bslide[i] < 0) {
-//                 ge25519_p1p1_to_p3(&u, &t);
-//                 ge25519_sub_precomp(&t, &u, &Bi[(-bslide[i]) / 2]);
-//             }
-//         } else {
-//             ge25519_cached Bi[8];
-//             point_precomputation(Bi, B);
-//             if (bslide[i] > 0) {
-//                 ge25519_p1p1_to_p3(&u, &t);
-//                 ge25519_add_cached(&t, &u, &Bi[bslide[i] / 2]);
-//             } else if (bslide[i] < 0) {
-//                 ge25519_p1p1_to_p3(&u, &t);
-//                 ge25519_sub_cached(&t, &u, &Bi[(-bslide[i]) / 2]);
-//             }
-//         }
-
-//         ge25519_p1p1_to_p2(r, &t);
-//     }
-// }
-
 
 #endif

@@ -89,6 +89,7 @@ int main(void)
     assert(crypto_vrf_rfc9381_BYTES == 80);
     assert(crypto_vrf_rfc9381_OUTPUTBYTES == 64);
 
+	//rfc9381 tests
     sodium_hex2bin(seed, 32, test_data[0].seed, (size_t) -1U, NULL, NULL, NULL);
     for (i = 0U; i < (sizeof test_data) / (sizeof test_data[0]); i++) {
         sodium_hex2bin(seed, 32,
@@ -140,13 +141,16 @@ int main(void)
         printf("%s\n\n", sodium_bin2hex(output_hex, sizeof output_hex, output, sizeof output));
     }
 
-    // ietfdraft03
+    // ietfdraft03 tests
     for (i = 0U; i < (sizeof test_data2) / (sizeof test_data2[0]); i++) {
 		memset(sk, 0, sizeof sk);
 		memset(pk, 0, sizeof pk);
 		memset(proof, 0, sizeof proof);
 		memset(output, 0, sizeof output);
+
+		//keypair generation is exactly the same
 		crypto_vrf_rfc9381_seed_keypair(pk, sk, test_data2[i].seed);
+		
 		if (memcmp(pk, test_data2[i].pk, crypto_vrf_PUBLICKEYBYTES) != 0){
 			printf("keypair_from_seed produced wrong pk: [%u]\n", i);
 			printhex("\tWanted: ", test_data2[i].pk, crypto_vrf_PUBLICKEYBYTES);

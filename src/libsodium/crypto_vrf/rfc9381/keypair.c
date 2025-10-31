@@ -30,12 +30,10 @@ int
 crypto_vrf_rfc9381_keypair(unsigned char *pk, unsigned char *sk)
 {
     unsigned char seed[32];
-    int           ret;
 
-    //maybe get rid of the ret here, as it is somehow redundant
     randombytes_buf(seed, sizeof seed);
-    ret = crypto_vrf_rfc9381_seed_keypair(pk, sk, seed);
+    crypto_vrf_rfc9381_seed_keypair(pk, sk, seed);
     sodium_memzero(seed, sizeof seed);
 
-    return ret;
+    return 0;
 }
