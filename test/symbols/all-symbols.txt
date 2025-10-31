@@ -640,6 +640,17 @@ crypto_verify_32
 crypto_verify_32_bytes
 crypto_verify_64
 crypto_verify_64_bytes
+crypto_vrf_publickeybytes
+crypto_vrf_secretkeybytes
+crypto_vrf_seedbytes
+crypto_vrf_proofbytes
+crypto_vrf_outputbytes
+crypto_vrf_primitive
+crypto_vrf_keypair
+crypto_vrf_seed_keypair
+crypto_vrf_prove
+crypto_vrf_verify
+crypto_vrf_proof_to_hash
 escrypt_PBKDF2_SHA256
 escrypt_alloc_region
 escrypt_free_local

@@ -56,6 +56,8 @@
 #include "sodium/crypto_xof_shake256.h"
 #include "sodium/crypto_xof_turboshake128.h"
 #include "sodium/crypto_xof_turboshake256.h"
+#include "sodium/crypto_vrf.h"
+#include "sodium/crypto_vrf_rfc9381.h"
 #include "sodium/randombytes.h"
 #include "sodium/randombytes_internal_random.h"
 #include "sodium/randombytes_sysrandom.h"
