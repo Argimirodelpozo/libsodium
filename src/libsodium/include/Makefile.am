@@ -66,6 +66,7 @@ SODIUM_EXPORT = \
 	sodium/crypto_xof_turboshake256.h \
 	sodium/crypto_vrf.h \
 	sodium/crypto_vrf_rfc9381.h \
+	sodium/crypto_vrf_ietfdraft03.h \
 	sodium/export.h \
 	sodium/randombytes.h \
 	sodium/randombytes_internal_random.h \

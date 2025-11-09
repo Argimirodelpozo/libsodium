@@ -38,11 +38,6 @@ int crypto_vrf_rfc9381_prove(unsigned char *proof,
 				 unsigned long long mlen, const unsigned char *sk);
 
 SODIUM_EXPORT
-int crypto_vrf_ietfdraft03_prove(unsigned char *proof,
-                             const unsigned char *m, unsigned long long mlen,
-                             const unsigned char *sk);
-
-SODIUM_EXPORT
 int crypto_vrf_rfc9381_verify(unsigned char *output,
 				  const unsigned char *pk,
 				  const unsigned char *proof,
@@ -51,20 +46,7 @@ int crypto_vrf_rfc9381_verify(unsigned char *output,
             __attribute__ ((warn_unused_result)) __attribute__ ((nonnull));
 
 SODIUM_EXPORT
-int crypto_vrf_ietfdraft03_verify(unsigned char *output,
-				  const unsigned char *pk,
-				  const unsigned char *proof,
-				  const unsigned char *m,
-				  unsigned long long mlen)
-            __attribute__ ((warn_unused_result)) __attribute__ ((nonnull));
-
-SODIUM_EXPORT
 int crypto_vrf_rfc9381_proof_to_hash(unsigned char *hash,
-				         const unsigned char *proof)
-                         __attribute__ ((nonnull));
-
-SODIUM_EXPORT
-int crypto_vrf_ietfdraft03_proof_to_hash(unsigned char *hash,
 				         const unsigned char *proof)
                          __attribute__ ((nonnull));
 

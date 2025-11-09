@@ -4,7 +4,6 @@
 #include "crypto_vrf_rfc9381.h"
 #include "private/ed25519_ref10.h"
 #include "randombytes.h"
-#include "utils.h"
 
 int
 crypto_vrf_rfc9381_seed_keypair(unsigned char *pk, unsigned char *sk,

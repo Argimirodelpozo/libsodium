@@ -4,7 +4,6 @@
 #include "crypto_hash_sha512.h"
 
 static const unsigned char SUITE = 0x04; /* ECVRF-ED25519-SHA512-ELL2 */
-
 static const unsigned char ZERO = 0x00;
 static const unsigned char TWO = 0x02;
 static const unsigned char THREE = 0x03;
@@ -27,8 +26,7 @@ sc25519_negate(unsigned char neg[32], const unsigned char s[32])
 
     memset(t_, 0, sizeof t_);
     memset(s_, 0, sizeof s_);
-    memcpy(t_ + 32, L,
-           32);
+    memcpy(t_ + 32, L, 32);
     memcpy(s_, s, 32);
     sodium_sub(t_, s_, sizeof t_);
     sc25519_reduce(t_);
@@ -36,14 +34,13 @@ sc25519_negate(unsigned char neg[32], const unsigned char s[32])
 }
 
 static int
-_ECVRF_encode_to_curve_h2c_suite(unsigned char H_string[32],
+ECVRF_encode_to_curve_h2c_suite(unsigned char H_string[32],
                                 const unsigned char Y_string[32],
-                                unsigned char* alpha, unsigned long long alphalen
+                                const unsigned char* alpha, const unsigned long long alphalen
                                 )
 {
     const char* ctx = "ECVRF_edwards25519_XMD:SHA-512_ELL2_NU_\4";
 
-    const size_t n = 1;
     unsigned char h[64];
     unsigned char h_be[2U * 48U];
     size_t        j;
@@ -53,12 +50,12 @@ _ECVRF_encode_to_curve_h2c_suite(unsigned char H_string[32],
     crypto_hash_sha512_state st;
     const unsigned char      empty_block[128U] = { 0 };
     unsigned char            u0[64];
-    unsigned char            ux[64] = { 0 };
+    unsigned char            ux[64];
     unsigned char            t[3] = { 0U, (unsigned char) h_len, 0U};
     unsigned char            ctx_len_u8;
     size_t                   ctx_len = ctx != NULL ? strlen(ctx) : 0U;
-
     ctx_len_u8 = (unsigned char) ctx_len;
+
     crypto_hash_sha512_init(&st);
     crypto_hash_sha512_update(&st, empty_block, sizeof empty_block);
     crypto_hash_sha512_update(&st, Y_string, 32);
@@ -66,11 +63,8 @@ _ECVRF_encode_to_curve_h2c_suite(unsigned char H_string[32],
     crypto_hash_sha512_update(&st, t, 3U);
     crypto_hash_sha512_update(&st, (const unsigned char *) ctx, ctx_len);
     crypto_hash_sha512_update(&st, &ctx_len_u8, 1U);
-    crypto_hash_sha512_final(&st, u0);
+    crypto_hash_sha512_final(&st, ux);
 
-    for (j = 0U; j < 64; j++) {
-        ux[j] ^= u0[j];
-    }
     t[2]++;
     crypto_hash_sha512_init(&st);
     crypto_hash_sha512_update(&st, ux, 64);
